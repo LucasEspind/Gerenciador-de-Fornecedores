@@ -1,0 +1,83 @@
+﻿@model FornecedoresModel
+@using Sistema_de_Cadastro_de_Fornecedor.Enumerator
+
+@{
+    ViewData["Title"] = "Cadastrar - Fornecedores";
+}
+
+<div class="container bg-dark p-5 rounded-5">
+
+    <div class="mb-5 text-center">
+        <h1 class="text-light">Cadastro de Fornecedor</h1>
+    </div>
+
+    <form method="post" asp-controller="Fornecedores" asp-action="Cadastrar">
+        <div class="mb-3">
+            <label for="Nome" class="form-label text-light">Nome</label>
+            <input asp-for="Nome"  type="text" class="form-control" id="Nome" placeholder="Nome do Fornecedor">
+            <span class="text-danger" asp-validation-for="Nome"></span>
+        </div>
+
+        <div class="mb-3">
+            <label for="CNPJ" class="form-label text-light">CNPJ</label>
+            <input asp-for="CNPJ" maxlength="14" minlength="14"  type="text" class="form-control" id="CNPJ" placeholder="CNPJ do Fornecedor">
+            <span class="text-danger" asp-validation-for="CNPJ"></span>
+        </div>
+
+        <div class="mb-3">
+            <label for="Especializacao" class="form-label text-light">Especialidade</label>
+            <select asp-for="Especializacao"  class="form-select">
+                <option value="">Escolha a Especialidade</option>
+            @foreach (var value in Enum.GetValues(typeof(EspecializacaoEnum)))
+            {
+                <option value="@value">@((EspecializacaoEnum)value)</option>
+            }
+            </select>
+            <span class="text-danger" asp-validation-for="Especializacao"></span>
+        </div>
+
+        <div class="mb-3">
+            <label for="CEP" class="form-label text-light">CEP</label>
+            <input asp-for="CEP" maxlength="8"  type="text" class="form-control" id="CEP" placeholder="CEP do Fornecedor">
+            <span class="text-danger" asp-validation-for="CEP"></span>
+        </div>
+
+        <div class="mb-3">
+            <label for="Endereco" class="form-label text-light">Endereço</label>
+            <input asp-for="Endereco"  type="text" class="form-control" id="Endereco" placeholder="Endereço do Fornecedor">
+            <span class="text-danger" asp-validation-for="Endereco"></span>
+        </div>
+
+        <div class="d-flex gap-5 mt-5">
+            <button type="submit" class="btn btn-success w-50">Adicionar</button>
+            <a class="btn btn-primary w-50" asp-controller="Fornecedores" asp-action="Index">Voltar</a>
+        </div>
+    </form>
+
+</div>
+
+<script>
+    $(document).ready(function () {
+        var cepInput = $("#CEP");
+        var enderecoInput = $("#Endereco");
+        var cepErrorMessage = $("#CEPErrorMessage");
+
+        cepInput.on("change", function () {
+            var cep = $(this).val().replace(/\D/g, '');
+            if (cep.length === 8) { 
+                $.getJSON("https://viacep.com.br/ws/" + cep + "/json/", function (data) {
+                    if (!("erro" in data)) {
+                        enderecoInput.val(data.logradouro);
+                        cepErrorMessage.text(""); 
+                    } else {
+                        enderecoInput.val("");
+                        cepErrorMessage.text("CEP não encontrado").css("color", "red");
+                    }
+                });
+            } else {
+                enderecoInput.val("");
+                cepErrorMessage.text("");
+            }
+        });
+    });
+</script>
